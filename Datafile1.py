@@ -1,22 +1,24 @@
 class datavalidation():
-    
-    def QualQuan():
-        qual=[]
-        quan=[]
-        for columnName in dataset.columns:
-            if (dataset[columnName].dtype=='O'):
-                qual.append(columnName)
-            else:
-                quan.append(columnName)
-        return qual,quan
-            
-    qual,quan=QualQuan()
+    import pandas as pd
+    import numpy as np
+    def quanQual(dataset):
+            quan=[]
+            qual=[]
+            for columnname in dataset.columns:
+                if(dataset[columnname].dtype=='O'):
+                    qual.append(columnname)
+                else:
+                    quan.append(columnname)       
+            return quan,qual     
         
-   
-    
-    def descriptive():
-        descriptive=pd.DataFrame(columns=quan,index=["Mean","Median","Mode","Q1:25%","Q2:50%","Q3:75%","90%","Q4:100%","IQR","1.5Rule",
-                                                     "LesserOutlier","GreaterOutlier","Min","Max"])
+
+    def descriptive(dataset, quan):
+        import pandas as pd
+        import numpy as np
+        descriptive = pd.DataFrame(columns=quan, index=[
+            "Mean", "Median", "Mode", "Q1:25%", "Q2:50%", "Q3:75%", "90%", 
+            "Q4:100%", "IQR", "1.5Rule", "LesserOutlier", "GreaterOutlier", "Min", "Max"
+        ])
         for columnName in quan:
             descriptive[columnName]["Mean"]=dataset[columnName].mean()
             descriptive[columnName]["Median"]=dataset[columnName].median()
@@ -34,9 +36,7 @@ class datavalidation():
             descriptive[columnName]["GreaterOutlier"]=descriptive[columnName]["Q3:75%"]+descriptive[columnName]["1.5Rule"]
         return descriptive
         
-    descriptive=descriptive()
-
-    def Outliers():
+    def Outliers(quan,descriptive):
         Outliers=[]
         for columnName in quan:
             if descriptive[columnName]["Min"]<descriptive[columnName]["LesserOutlier"]:
@@ -46,15 +46,15 @@ class datavalidation():
                 Outliers.append(columnName)
         return Outliers
     
-    Outliers=Outliers() 
+     
 
-    def replaces():
+    def replaces(Outliers,descriptive,dataset):
         for columnName in Outliers:
             dataset[columnName][dataset[columnName]<descriptive[columnName]["LesserOutlier"]]=descriptive[columnName]["LesserOutlier"]
             dataset[columnName][dataset[columnName]>descriptive[columnName]["GreaterOutlier"]]=descriptive[columnName]["GreaterOutlier"]
         return replaces
         
-    replaces=replaces()
+  
 
     def freqTable(columnName,dataset):
         freqTable=pd.DataFrame(columns=["Unique_Value","Frequency","Relative_Frequency","Cumsum"])
