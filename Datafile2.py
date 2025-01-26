@@ -1,24 +1,27 @@
 class datavalidation():
     import pandas as pd
     import numpy as np
+    
     def quanQual(dataset):
-            quan=[]
-            qual=[]
-            for columnname in dataset.columns:
-                if(dataset[columnname].dtype=='O'):
-                    qual.append(columnname)
-                else:
-                    quan.append(columnname)       
-            return quan,qual     
+        qual=[]
+        quan=[]
+        for columnName in dataset.columns:
+            if (dataset[columnName].dtype=='O'):
+                qual.append(columnName)
+            else:
+                quan.append(columnName)
+        return quan,qual
+            
         
 
     def descriptive(dataset, quan):
+        
         import pandas as pd
         import numpy as np
         # Create an empty DataFrame with specified rows (index) and columns
         descriptive = pd.DataFrame(index=["Mean", "Median", "Mode", "Q1:25%", "Q2:50%", "Q3:75%", "90%", "Q4:100%", 
-                                          "IQR", "1.5Rule", "LesserOutlier", "GreaterOutlier", "Min", "Max"], 
-                                   columns=quan)
+                                          "IQR", "1.5Rule", "LesserOutlier", "GreaterOutlier", "Min", "Max"], columns=quan)
+                                   
         
         # Precompute dataset.describe() to avoid redundant calculations
         summary = dataset[quan].describe()
@@ -58,22 +61,19 @@ class datavalidation():
             if descriptive[columnName]["Max"]>GreaterOutlier:
                 Outliers.append(columnName)
         return Outliers
-
-
-    
-     
-
-    def replaces(dataset,descriptive,Outliers):
+ 
+    def replaces(dataset, descriptive, Outliers):
         for columnName in Outliers:
-            LesserOutlier=descriptive[columnName]["LesserOutlier"]
-            GreaterOutlier=descriptive[columnName]["GreaterOutlier"]
-            #dataset[columnName][dataset[columnName]<descriptive[columnName]["LesserOutlier"]]=descriptive[columnName]["LesserOutlier"]
-            #dataset[columnName][dataset[columnName]<LesserOutlier]=LesserOutlier
+            LesserOutlier = descriptive[columnName]["LesserOutlier"]
+            GreaterOutlier = descriptive[columnName]["GreaterOutlier"]
+            
+            # Cap values below LesserOutlier
             dataset.loc[dataset[columnName] < LesserOutlier, columnName] = LesserOutlier
-            #dataset[columnName][dataset[columnName]>descriptive[columnName]["GreaterOutlier"]]=descriptive[columnName]["GreaterOutlier"]
-            #dataset[columnName][dataset[columnName]>GreaterOutlier]=GreaterOutlier                 
+            
+            # Cap values above GreaterOutlier
             dataset.loc[dataset[columnName] > GreaterOutlier, columnName] = GreaterOutlier
-        return replaces()
+        
+        return dataset
 
 
         
